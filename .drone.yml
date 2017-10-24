@@ -1,0 +1,40 @@
+services:
+  docker:
+    image: docker:dind
+    privileged: true
+
+pipeline:
+  build:
+    image: docker
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+       - docker build -t devbuild .
+
+  test:
+    image: docker
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+      - apk add --no-cache curl
+      - docker run --name=DEV -d -e UID=0 -p 7878:7878 devbuild
+      - sleep 15  # Wait for Radarr to start!
+      - docker logs DEV
+      - curl -sSL docker:7878 | grep "Radarr Ver"
+      - docker kill DEV # Not really needed, but keeps things quick
+
+  publish:
+    image: docker
+    secrets: [ DOCKER_USER, DOCKER_PASS ]
+    environment:
+       - DOCKER_HOST=tcp://docker:2375
+    commands:
+       - apk add --no-cache openssl jq
+       - export CURVER=$(wget -O- https://api.github.com/repos/radarr/radarr/releases | jq -r '.[0].tag_name')
+         # Grab just the version, not the hash. Used for tagging
+       - echo $DOCKER_USER
+       - docker tag devbuild adamant/radarr:latest
+       - docker tag devbuild adamant/radarr:$CURVER
+       - docker login -u $DOCKER_USER -p $DOCKER_PASS
+       - docker push adamant/radarr
+       - echo "CONGRATS! SUCCESSFULLY BUILT RADARR!"
