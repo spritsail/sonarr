@@ -6,7 +6,7 @@ ENV UID=906 GID=900
 ARG TINI_VERSION=v0.14.0
 ARG SU_EXEC_VER=v0.2
 
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/bin/tini
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /sbin/tini
 ADD https://github.com/javabean/su-exec/releases/download/v0.2/su-exec.amd64 /usr/bin/su-exec
 ADD entrypoint.sh /usr/bin/entrypoint
 
@@ -23,5 +23,5 @@ VOLUME ["/config", "/media"]
 
 EXPOSE 8989
 
-ENTRYPOINT ["tini","--","/usr/bin/entrypoint"]
+ENTRYPOINT ["/sbin/tini","--","/usr/bin/entrypoint"]
 CMD ["mono","/NzbDrone/NzbDrone.exe","--no-browser","-data=/config"]
