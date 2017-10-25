@@ -13,7 +13,7 @@ ADD entrypoint.sh /usr/bin/entrypoint
 RUN apt-get update \
  && apt-get install -y curl libmono-cil-dev mediainfo
 
-RUN chmod +x /usr/bin/* \
+RUN chmod +x /usr/bin/* /sbin/tini \
  && sonarr_tag=$(curl -sX GET "https://api.github.com/repos/Sonarr/Sonarr/tags" | awk '/name/{print $4;exit}' FS='[""]') \
  && curl -L http://update.sonarr.tv/v2/master/mono/NzbDrone.master.tar.gz | tar xz \
  && chmod -R 755 /NzbDrone/*
