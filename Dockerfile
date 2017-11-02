@@ -1,7 +1,7 @@
 FROM alpine:edge
 LABEL maintainer="Adam Dodman <adam.dodman@gmx.com>"
 
-ENV UID=901 GID=900
+ENV UID=906 GID=900
 
 ARG SONARR_TAG
 
