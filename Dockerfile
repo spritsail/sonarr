@@ -4,6 +4,7 @@ LABEL mainatiner="Adam Dodman <adam.dodman@gmx.com>"
 ENV UID=906 GID=900
 
 ARG SONARR_TAG
+ARG SONARR_BRANCH=master
 
 ARG TINI_VERSION=v0.16.1
 ARG SU_EXEC_VER=v0.2
@@ -16,11 +17,11 @@ RUN apt-get update \
     \
  && chmod +x /sbin/su-exec /sbin/tini \
  && if [ -z "$SONARR_TAG" ]; then \
-        export SONARR_TAG="$(curl -fL "https://api.github.com/repos/Sonarr/Sonarr/tags" | jq -r '.[0].name')"; \
+        export SONARR_TAG="$(curl -fL "http://services.sonarr.tv/v1/update/${SONARR_BRANCH}?os=linux" | jq -r '.updatePackage.version')"; \
     fi \
  && mkdir -p /sonarr \
  && echo "Building Sonarr $SONARR_TAG" \
- && curl -fL "http://download.sonarr.tv/v2/master/mono/NzbDrone.master.${SONARR_TAG#v}.mono.tar.gz" \
+ && curl -fL "http://download.sonarr.tv/v2/master/mono/NzbDrone.${SONARR_BRANCH}.${SONARR_TAG}.mono.tar.gz" \
         | tar xz -C /sonarr --strip-components=1 \
  && find /sonarr -type f -exec chmod 644 {} + \
  && find /sonarr -type d -o -name '*.exe' -exec chmod 755 {} + \
