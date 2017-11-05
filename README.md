@@ -4,7 +4,7 @@
 
 [![](https://images.microbadger.com/badges/image/adamant/sonarr.svg)](https://microbadger.com/images/adamant/sonarr) [![Docker Pulls](https://img.shields.io/docker/pulls/adamant/sonarr.svg)][hub] [![Docker Stars](https://img.shields.io/docker/stars/adamant/sonarr.svg)][hub] [![Build Status](https://drone.adam-ant.co.uk/api/badges/Adam-Ant/docker-sonarr/status.svg)](https://drone.adam-ant.co.uk/Adam-Ant/docker-sonarr)
 
-[Sonarr](https://github.com/Sonarr/Sonarr) running in Alpine Linux on (for now) experimental Mono builds. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
+[Sonarr](https://github.com/Sonarr/Sonarr) running in Debian Linux. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
 
 ## Usage
 
