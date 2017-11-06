@@ -1,40 +1,58 @@
-services:
-  docker:
-    image: docker:dind
-    privileged: true
-
 pipeline:
+  identify:
+    image: docker
+    commands:
+      # Grab the current version, prevents race conditions
+      - apk add --no-cache curl jq
+      - curl -fL http://services.sonarr.tv/v1/update/master?os=linux
+            | tee /dev/stderr
+            | jq -r '.updatePackage.version' > .sonarr_tag
+
   build:
     image: docker
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    secrets: [ GHAPI ]
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-       - docker build -t devbuild .
+      - docker build
+            --no-cache --pull
+            --build-arg SONARR_TAG=$(cat .sonarr_tag)
+            --build-arg GHAPI="$GHAPI"
+            -t sonarr-dev .
 
   test:
     image: docker
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
       - apk add --no-cache curl
-      - docker run --name=DEV -d -e UID=0 -p 7878:7878 devbuild
-      - sleep 15  # Wait for Radarr to start!
-      - docker logs DEV
-      - curl -sSL docker:7878 | grep "Radarr Ver"
-      - docker kill DEV # Not really needed, but keeps things quick
+      - mkdir -p /tmp/config
+      - chown 906:900 /tmp/config
+      - CON_NAME=$(docker run -dt -v /tmp/config:/config sonarr-dev)
+      - timeout -t 12 -- docker logs -f $$CON_NAME | cat &
+      - sleep 10
+      - IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
+      - if [ -z "$IP" ]; then
+            echo "The container exited.. sadpanda";
+            docker inspect --format='{{.State.ExitCode}}' $$CON_NAME;
+            exit 25;
+        fi
+      - curl -L --retry-max-time 30 --max-time 5 --retry 5 --retry-delay 5 $IP:8989 > /dev/null
+      - docker kill $$CON_NAME
+      - docker rm $$CON_NAME
 
   publish:
     image: docker
     secrets: [ DOCKER_USER, DOCKER_PASS ]
-    environment:
-       - DOCKER_HOST=tcp://docker:2375
+    when:
+       event: [ push, tag, deployment ]
+    volumes:
+       - /var/run/docker.sock:/var/run/docker.sock
     commands:
-       - apk add --no-cache openssl jq
-       - export CURVER=$(wget -O- https://api.github.com/repos/radarr/radarr/releases | jq -r '.[0].tag_name')
-         # Grab just the version, not the hash. Used for tagging
        - echo $DOCKER_USER
-       - docker tag devbuild adamant/radarr:latest
-       - docker tag devbuild adamant/radarr:$CURVER
+       - docker tag sonarr-dev adamant/sonarr:latest
+       - docker tag sonarr-dev adamant/sonarr:$(cat .sonarr_tag)
        - docker login -u $DOCKER_USER -p $DOCKER_PASS
-       - docker push adamant/radarr
-       - echo "CONGRATS! SUCCESSFULLY BUILT RADARR!"
+       - docker push adamant/sonarr
+       - docker rmi sonarr-dev adamant/sonarr:latest adamant/sonarr:$(cat .sonarr_tag)
+       - echo "CONGRATS! SUCCESSFULLY BUILT SONARR-STABLE!"
