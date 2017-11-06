@@ -51,4 +51,4 @@ setOpt UpdateAutomatically False
 setOpt LaunchBrowser False
 
 # Format the document pretty :)
-xmlstarlet fo "$CFG_FILE" &>/dev/null
+xmlstarlet fo "$CFG_FILE" >/dev/null
