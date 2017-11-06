@@ -10,7 +10,6 @@ pipeline:
 
   build:
     image: docker
-    secrets: [ GHAPI ]
     volumes:
        - /var/run/docker.sock:/var/run/docker.sock
     commands:
