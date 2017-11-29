@@ -26,7 +26,7 @@ pipeline:
       - apk add --no-cache curl
       - mkdir -p /tmp/config
       - chown 906:900 /tmp/config
-      - CON_NAME=$(docker run -dt -v /tmp/config:/config sonarr-dev)
+      - CON_NAME=$(docker run -dt -v /tmp/config:/config -e UID=0 sonarr-dev)
       - timeout -t 12 -- docker logs -f $$CON_NAME | cat &
       - sleep 10
       - IP=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $$CON_NAME)
