@@ -1,7 +1,13 @@
 #!/bin/sh
 set -e
 
-CFG_FILE="$CFG_DIR/config.xml"
+CFG_FILE_DEST="$CFG_DIR/config.xml"
+
+if [ ! -f "$CFG_FILE_DEST" ]; then
+    CFG_FILE="$CFG_FILE_DEST"
+else
+    CFG_FILE="$(mktemp -t "$CFG_FILE_DEST.XXXXXX")"
+fi
 
 getOpt() {
     xmlstarlet sel -t -c /Config/"$1" "$CFG_FILE"
@@ -52,3 +58,13 @@ setOpt LaunchBrowser False
 
 # Format the document pretty :)
 xmlstarlet fo "$CFG_FILE" >/dev/null
+
+if [ -f "$CFG_FILE_DEST" ]; then
+    # Preserve old configuration, in case of ENOSPC or other errors
+    mv -f "$CFG_FILE_DEST" "$CFG_FILE_DEST.old"
+fi
+
+# Move config into final location
+if [ "$CFG_FILE" != "$CFG_FILE_DEST" ]; then
+    mv "$CFG_FILE" "$CFG_FILE_DEST"
+fi
