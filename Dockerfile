@@ -1,21 +1,20 @@
 FROM debian:stretch-slim
 LABEL mainatiner="Adam Dodman <adam.dodman@gmx.com>"
 
-ENV UID=906 GID=900
+ENV SUID=906 SGID=900
 
 ARG SONARR_TAG
 ARG SONARR_BRANCH=master
 
 ARG TINI_VERSION=v0.16.1
-ARG SU_EXEC_VER=v0.2
-
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /sbin/tini
-ADD https://github.com/javabean/su-exec/releases/download/v0.2/su-exec.amd64 /sbin/su-exec
+ARG SU_EXEC_VER=v0.3
 
 RUN apt-get update \
  && apt-get install -y libmono-cil-dev mediainfo xmlstarlet curl jq \
     \
- && chmod +x /sbin/su-exec /sbin/tini \
+ && curl -Lo /sbin/su-exec https://github.com/frebib/su-exec/releases/download/${SU_EXEC_VER}/su-exec-$(uname -m) \
+ && curl -Lo /sbin/tini https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini \
+ && chmod 755 /sbin/su-exec /sbin/tini \
  && if [ -z "$SONARR_TAG" ]; then \
         export SONARR_TAG="$(curl -fL "http://services.sonarr.tv/v1/update/${SONARR_BRANCH}?os=linux" | jq -r '.updatePackage.version')"; \
     fi \
