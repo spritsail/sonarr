@@ -1,12 +1,12 @@
 #!/bin/sh
 set -e
 
-CFG_FILE_DEST="$CFG_DIR/config.xml"
+CFG_FILE="$CFG_DIR/config.xml"
+CFG_FILE_BAK="$(mktemp -u "$CFG_FILE.bak.XXXXXX")"
 
-if [ ! -f "$CFG_FILE_DEST" ]; then
-    CFG_FILE="$CFG_FILE_DEST"
-else
-    CFG_FILE="$(mktemp -t "$CFG_FILE_DEST.XXXXXX")"
+if [ -f "$CFG_FILE" ]; then
+    # Preserve old configuration, in case of ENOSPC or other errors
+    cp "$CFG_FILE" "$CFG_FILE_BAK" || (echo "Error: Could not backup config file" >&2; exit 99)
 fi
 
 getOpt() {
@@ -23,7 +23,7 @@ setOpt() {
     fi
 }
 bool() {
-    local var="$(echo $1 | tr 'A-Z' 'a-z')"
+    local var="$(echo "$1" | tr 'A-Z' 'a-z')"
     case "$var" in
         y|ye|yes|t|tr|tru|true|1)
             echo True;;
@@ -31,40 +31,37 @@ bool() {
             echo False;;
     esac
 }
+upper() {
+    echo $1 | awk '{print toupper($0)}'
+}
+camel() {
+    echo $1 | awk '{print toupper(substr($1,1,1)) tolower(substr($1,2))}'
+}
 
-# Create empty config.xml file
-if [ ! -f "$CFG_FILE" ]; then
+# Create empty config.xml file (or fill existing empty file)
+if [ ! -f "$CFG_FILE" ] || [ ! -s "$CFG_FILE" ]; then
     (echo '<Config>'; echo '</Config>') > "$CFG_FILE"
 fi
 
-# Add options that are specified in the environment
-if [ -n "$LOG_LEVEL" ]; then
-    setOpt LogLevel $LOG_LEVEL
-fi
-if [ -n "$URL_BASE" ]; then
-    setOpt UrlBase $URL_BASE
-fi
-if [ -n "$BRANCH" ]; then
-    setOpt Branch $BRANCH
-fi
-if [ -n "$ANALYTICS" ]; then
-    setOpt AnalyticsEnabled $(bool $ANALYTICS)
-fi
-
-# Disable automatic updates
-setOpt UpdateAutomatically False
-# Don't launch a browser
+# Add options that are specified in the environment 
+# and set some sane defaults.
+[ -n "$API_KEY" ]   && setOpt ApiKey $(upper "$API_KEY")
+setOpt AnalyticsEnabled $(bool "${ANALYTICS:-false}")
+setOpt Branch "${BRANCH:-master}"
+setOpt BindAddress '*'
+setOpt EnableSsl $(bool "${ENABLE_SSL:-false}")
 setOpt LaunchBrowser False
+setOpt LogLevel $(camel "${LOG_LEVEL:-info}")
+setOpt UpdateAutomatically $(bool "${AUTOUPDATE:-false}")
+setOpt UrlBase "$URL_BASE"
+
+# NOTE: If these defaults need to be set differently,
+# please open an issue or pull request on the repo: 
+#   https://github.com/Adam-Ant/docker-sonarr
 
 # Format the document pretty :)
 xmlstarlet fo "$CFG_FILE" >/dev/null
 
-if [ -f "$CFG_FILE_DEST" ]; then
-    # Preserve old configuration, in case of ENOSPC or other errors
-    mv -f "$CFG_FILE_DEST" "$CFG_FILE_DEST.old"
-fi
-
-# Move config into final location
-if [ "$CFG_FILE" != "$CFG_FILE_DEST" ]; then
-    mv "$CFG_FILE" "$CFG_FILE_DEST"
-fi
+# Finally, remove backup file after successfully creating new one
+# This is done to prevent trampling the config when the disk is full
+rm -f "$CFG_FILE_BAK"
