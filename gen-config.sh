@@ -38,26 +38,31 @@ camel() {
     echo $1 | awk '{print toupper(substr($1,1,1)) tolower(substr($1,2))}'
 }
 
-# Create empty config.xml file (or fill existing empty file)
-if [ ! -f "$CFG_FILE" ] || [ ! -s "$CFG_FILE" ]; then
-    (echo '<Config>'; echo '</Config>') > "$CFG_FILE"
-fi
-
-# Add options that are specified in the environment 
-# and set some sane defaults.
-[ -n "$API_KEY" ]   && setOpt ApiKey $(upper "$API_KEY")
-setOpt AnalyticsEnabled $(bool "${ANALYTICS:-false}")
-setOpt Branch "${BRANCH:-master}"
-setOpt BindAddress '*'
-setOpt EnableSsl $(bool "${ENABLE_SSL:-false}")
-setOpt LaunchBrowser False
-setOpt LogLevel $(camel "${LOG_LEVEL:-info}")
-setOpt UpdateAutomatically $(bool "${AUTOUPDATE:-false}")
-setOpt UrlBase "$URL_BASE"
+# Create config.xml file and fill in some sane defaults (or fill existing empty file)
 
 # NOTE: If these defaults need to be set differently,
-# please open an issue or pull request on the repo: 
+# please open an issue or pull request on the repo:
 #   https://github.com/Adam-Ant/docker-sonarr
+
+if [ ! -f "$CFG_FILE" ] || [ ! -s "$CFG_FILE" ]; then
+    (echo '<Config>'; echo '</Config>') > "$CFG_FILE"
+    setOpt AnalyticsEnabled False
+    setOpt Branch 'master'
+    setOpt BindAddress '*'
+    setOpt EnableSsl False
+    setOpt LaunchBrowser False
+    setOpt LogLevel 'info'
+    setOpt UpdateAutomatically False
+fi
+
+# If they exist, add options that are specified in the environment
+[ -n "$API_KEY" ]   && setOpt ApiKey $(lower "$API_KEY")
+[ -n "$ANALYTICS" ] && setOpt AnalyticsEnabled $(bool "${ANALYTICS:-false}")
+[ -n "$BRANCH" ] && setOpt Branch "${BRANCH:-master}"
+[ -n "$ENABLE_SSL" ] && setOpt EnableSsl $(bool "${ENABLE_SSL:-false}")
+[ -n "$LOG_LEVEL" ] && setOpt LogLevel $(camel "${LOG_LEVEL:-info}")
+[ -n "$URL_BASE" ] && setOpt UrlBase "$URL_BASE"
+
 
 # Format the document pretty :)
 xmlstarlet fo "$CFG_FILE" >/dev/null
