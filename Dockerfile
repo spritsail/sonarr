@@ -1,7 +1,13 @@
 FROM debian:stretch-slim
-LABEL mainatiner="Adam Dodman <adam.dodman@gmx.com>"
 
 ENV SUID=906 SGID=900
+
+LABEL maintainer="Spritsail <sonarr@spritsail.io>" \
+      org.label-schema.vendor="Spritsail" \
+      org.label-schema.name="Sonarr" \
+      org.label-schema.url="https://github.com/spritsail/sonarr" \
+      org.label-schema.description="Sonarr - A TV show management and downloading program" \
+      org.label-schema.version=${SONARR_TAG}
 
 ARG SONARR_TAG
 ARG SONARR_BRANCH=master

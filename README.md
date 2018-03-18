@@ -1,8 +1,17 @@
-[hub]: https://hub.docker.com/r/adamant/sonarr
+[hub]: https://hub.docker.com/r/spritsail/deluge
+[git]: https://github.com/spritsail/deluge
+[drone]: https://drone.spritsail.io/spritsail/deluge
+[mbdg]: https://microbadger.com/images/spritsail/deluge
 
-# [adamant/sonarr][hub]
+# [spritsail/Deluge][hub]
 
-[![](https://images.microbadger.com/badges/image/adamant/sonarr.svg)](https://microbadger.com/images/adamant/sonarr) [![Docker Pulls](https://img.shields.io/docker/pulls/adamant/sonarr.svg)][hub] [![Docker Stars](https://img.shields.io/docker/stars/adamant/sonarr.svg)][hub] [![Build Status](https://drone.adam-ant.co.uk/api/badges/Adam-Ant/docker-sonarr/status.svg)](https://drone.adam-ant.co.uk/Adam-Ant/docker-sonarr)
+[![](https://images.microbadger.com/badges/image/spritsail/deluge.svg)][mbdg]
+[![Latest Version](https://images.microbadger.com/badges/version/spritsail/deluge.svg)][hub]
+[![Git Commit](https://images.microbadger.com/badges/commit/spritsail/deluge.svg)][git]
+[![Docker Pulls](https://img.shields.io/docker/pulls/spritsail/deluge.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/spritsail/deluge.svg)][hub]
+[![Build Status](https://drone.spritsail.io/api/badges/spritsail/deluge/status.svg)][drone]
+
 
 [Sonarr](https://github.com/Sonarr/Sonarr) running in Debian Linux. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
 
@@ -15,7 +24,7 @@ docker run -dt
     --restart=always
     -v $PWD/config:/config
     -p 8989:8989
-    adamant/sonarr
+    spritsail/sonarr
 ```
 
 **Note:** _Is is important to use `-t` (pseudo-tty) as without it there are no logs produced._
@@ -30,7 +39,7 @@ docker run -dt
     -e URL_BASE=/sonarr
     -e ANALYTICS=false
     -e ...
-    adamant/sonarr
+    spritsail/sonarr
 ```
 
 ### Volumes
@@ -38,6 +47,8 @@ docker run -dt
 * `/config` - Sonarr configuration file and database storage. Should be readable and writeable by `$UID` 
 
 Other files accessed by Sonarr such as tv-show directories should also be readable and writeable by `$UID` or `$GID` with sufficient permissions.
+
+`$UID` defaults to 906
 
 ### Configuration
 
