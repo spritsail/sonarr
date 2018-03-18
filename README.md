@@ -1,16 +1,16 @@
-[hub]: https://hub.docker.com/r/spritsail/deluge
-[git]: https://github.com/spritsail/deluge
-[drone]: https://drone.spritsail.io/spritsail/deluge
-[mbdg]: https://microbadger.com/images/spritsail/deluge
+[hub]: https://hub.docker.com/r/spritsail/sonarr
+[git]: https://github.com/spritsail/sonarr
+[drone]: https://drone.spritsail.io/spritsail/sonarr
+[mbdg]: https://microbadger.com/images/spritsail/sonarr
 
-# [spritsail/Deluge][hub]
+# [spritsail/Sonarr][hub]
 
-[![](https://images.microbadger.com/badges/image/spritsail/deluge.svg)][mbdg]
-[![Latest Version](https://images.microbadger.com/badges/version/spritsail/deluge.svg)][hub]
-[![Git Commit](https://images.microbadger.com/badges/commit/spritsail/deluge.svg)][git]
-[![Docker Pulls](https://img.shields.io/docker/pulls/spritsail/deluge.svg)][hub]
-[![Docker Stars](https://img.shields.io/docker/stars/spritsail/deluge.svg)][hub]
-[![Build Status](https://drone.spritsail.io/api/badges/spritsail/deluge/status.svg)][drone]
+[![](https://images.microbadger.com/badges/image/spritsail/sonarr.svg)][mbdg]
+[![Latest Version](https://images.microbadger.com/badges/version/spritsail/sonarr.svg)][hub]
+[![Git Commit](https://images.microbadger.com/badges/commit/spritsail/sonarr.svg)][git]
+[![Docker Pulls](https://img.shields.io/docker/pulls/spritsail/sonarr.svg)][hub]
+[![Docker Stars](https://img.shields.io/docker/stars/spritsail/sonarr.svg)][hub]
+[![Build Status](https://drone.spritsail.io/api/badges/spritsail/sonarr/status.svg)][drone]
 
 
 [Sonarr](https://github.com/Sonarr/Sonarr) running in Debian Linux. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
