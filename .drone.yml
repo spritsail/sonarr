@@ -9,14 +9,11 @@ pipeline:
             | jq -r '.updatePackage.version' > .sonarr_tag
 
   build:
-    image: docker
-    volumes:
-       - /var/run/docker.sock:/var/run/docker.sock
-    commands:
-      - docker build
-            --no-cache --pull
-            --build-arg SONARR_TAG=$(cat .sonarr_tag)
-            -t sonarr-dev .
+      image: spritsail/docker-build
+      volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+      repo: sonarr-dev
+      build_args:
+        - 'SONARR_TAG=%file: .sonarr_tag'
 
   test:
     image: docker
