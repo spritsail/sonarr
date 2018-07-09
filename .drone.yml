@@ -1,19 +1,8 @@
 pipeline:
-  identify:
-    image: docker
-    commands:
-      # Grab the current version, prevents race conditions
-      - apk add --no-cache curl jq
-      - curl -fL http://services.sonarr.tv/v1/update/master?os=linux
-            | tee /dev/stderr
-            | jq -r '.updatePackage.version' > .sonarr_tag
-
   build:
       image: spritsail/docker-build
       volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
       repo: sonarr-dev
-      build_args:
-        - 'SONARR_TAG=%file: .sonarr_tag'
 
   test:
     image: docker
@@ -44,7 +33,7 @@ pipeline:
     repo: spritsail/sonarr
     tags:
       - 'latest'
-      - '%fileauto: .sonarr_tag'
+      - '%labelauto: io.spritsail.version.sonarr'
 
   notify:
     image: spritsail/notify
