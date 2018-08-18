@@ -31,12 +31,9 @@ bool() {
             echo False;;
     esac
 }
-upper() {
-    echo $1 | awk '{print toupper($0)}'
-}
-camel() {
-    echo $1 | awk '{print toupper(substr($1,1,1)) tolower(substr($1,2))}'
-}
+upper() { echo $1 | awk '{print toupper($0)}'; }
+lower() { echo $1 | awk '{print tolower($0)}'; }
+camel() { echo $1 | awk '{print toupper(substr($1,1,1)) tolower(substr($1,2))}'; }
 
 # Create config.xml file and fill in some sane defaults (or fill existing empty file)
 
