@@ -13,7 +13,7 @@
 [![Build Status](https://drone.spritsail.io/api/badges/spritsail/sonarr/status.svg)][drone]
 
 
-[Sonarr](https://github.com/Sonarr/Sonarr) running in Debian Linux. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
+[Sonarr](https://github.com/Sonarr/Sonarr) running in Alpine Linux. This container provides some simple initial configuration scripts to set some runtime variables (see [#Configuration](#configuration) for details)
 
 ## Usage
 
