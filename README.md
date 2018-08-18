@@ -3,9 +3,9 @@
 [drone]: https://drone.spritsail.io/spritsail/sonarr
 [mbdg]: https://microbadger.com/images/spritsail/sonarr
 
-# [spritsail/Sonarr][hub]
+# [Spritsail/Sonarr][hub]
 
-[![](https://images.microbadger.com/badges/image/spritsail/sonarr.svg)][mbdg]
+[![Layers](https://images.microbadger.com/badges/image/spritsail/sonarr.svg)][mbdg]
 [![Latest Version](https://images.microbadger.com/badges/version/spritsail/sonarr.svg)][hub]
 [![Git Commit](https://images.microbadger.com/badges/commit/spritsail/sonarr.svg)][git]
 [![Docker Pulls](https://img.shields.io/docker/pulls/spritsail/sonarr.svg)][hub]
@@ -44,11 +44,11 @@ docker run -dt
 
 ### Volumes
 
-* `/config` - Sonarr configuration file and database storage. Should be readable and writeable by `$UID` 
+* `/config` - Sonarr configuration file and database storage. Should be readable and writeable by `$SUID`
 
-Other files accessed by Sonarr such as tv-show directories should also be readable and writeable by `$UID` or `$GID` with sufficient permissions.
+Other files accessed by Sonarr such as tv-show directories should also be readable and writeable by `$SUID` or `$SGID` with sufficient permissions.
 
-`$UID` defaults to 906
+`$SUID` defaults to 906
 
 ### Configuration
 
