@@ -26,7 +26,7 @@ RUN apk add --no-cache sqlite-libs libmediainfo-patched xmlstarlet \
  && rm -rf NzbDrone.Update \
  && chmod +x /usr/local/bin/*.sh
 
-VOLUME ["/config", "/media"]
+VOLUME /config
 ENV XDG_CONFIG_HOME=/config
 
 EXPOSE 8989
