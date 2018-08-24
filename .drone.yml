@@ -25,7 +25,7 @@ pipeline:
     repo: spritsail/sonarr
     tags:
       - 'latest'
-      - '%labelauto: io.spritsail.version.sonarr'
+      - '%label io.spritsail.version.sonarr | %auto'
 
   notify:
     image: spritsail/notify
