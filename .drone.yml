@@ -1,33 +1,45 @@
-pipeline:
-  build:
-    image: spritsail/docker-build
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    repo: sonarr-dev
+---
+kind: pipeline
+name: default
 
-  test:
-    image: spritsail/docker-test
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    repo: sonarr-dev
-    run_args: -t -e SUID=0 -e API_KEY=drone
-    curl: ':8989/api/system/status'
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  pull: always
+  image: spritsail/docker-build
+
+- name: test
+  pull: always
+  image: spritsail/docker-test
+  settings:
+    curl: :8989/api/system/status
     curl_opts: --header x-api-key:drone
-    verbose: true
     pipe: |
       jq -r ".version" |
       grep -qw "$(label io.spritsail.version.sonarr)"
+    run_args: -t -e SUID=0 -e API_KEY=drone
+    verbose: true
 
-  publish:
-    image: spritsail/docker-publish
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
-    secrets: [ docker_username, docker_password, microbadger_token ]
-    when: { branch: [ master ], event: [ push, tag, deployment ] }
-    from: sonarr-dev
+- name: publish
+  pull: always
+  image: spritsail/docker-publish
+  settings:
+    login: {from_secret: docker_login}
     repo: spritsail/sonarr
     tags:
-      - 'latest'
-      - '%label io.spritsail.version.sonarr | %auto'
+    - latest
+    - "%label io.spritsail.version.sonarr | %auto"
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-  notify:
-    image: spritsail/notify
-    when: { status: [ success, failure ] }
-    secrets: [ webhook_url, notify_token ]
+---
+kind: signature
+hmac: 24e6752856670a0140bda06411ee61ed163d34b4d3bb389426a2d22b0f3c5ba4
+
+...

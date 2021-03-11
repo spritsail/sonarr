@@ -1,6 +1,8 @@
 FROM spritsail/mono:4.5
 
-ARG SONARR_VER=2.0.0.5322
+ARG SONARR_VER=3.0.5.1144
+
+ARG SONARR_BRANCH=main
 
 ENV SUID=906 SGID=900
 
@@ -16,21 +18,14 @@ WORKDIR /sonarr
 
 COPY *.sh /usr/local/bin/
 
-RUN apk add --no-cache sqlite-libs libmediainfo xmlstarlet \
- && wget -O- "http://download.sonarr.tv/v2/master/mono/NzbDrone.master.${SONARR_VER}.mono.tar.gz" \
+RUN apk add --no-cache ca-certificates-mono sqlite-libs libmediainfo xmlstarlet \
+ && wget -O- "https://download.sonarr.tv/v3/${SONARR_BRANCH}/${SONARR_VER}/Sonarr.${SONARR_BRANCH}.${SONARR_VER}.linux.tar.gz" \
         | tar xz --strip-components=1 \
  && find -type f -exec chmod 644 {} + \
  && find -type d -o -name '*.exe' -exec chmod 755 {} + \
  && find -name '*.mdb' -delete \
-# Remove unmanted js source-map files
- && find UI -name '*.map' -delete \
-# These directories are in the wrong place
- && rm -rf UI/Content/_output \
 # Where we're going, we don't need ~roads~ updates!
- && rm -rf NzbDrone.Update \
- && apk add --no-cache ca-certificates-mono \
- && update-ca-certificates \
- && apk del --no-cache ca-certificates-mono \
+ && rm -r Sonarr.Update \
  && chmod +x /usr/local/bin/*.sh
 
 VOLUME /config
@@ -43,4 +38,4 @@ HEALTHCHECK --start-period=10s --timeout=5s \
             --header "x-api-key: $(xmlstarlet sel -t -v '/Config/ApiKey' /config/config.xml)"
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
-CMD ["mono", "/sonarr/NzbDrone.exe", "--no-browser", "--data=/config"]
+CMD ["mono", "/sonarr/Sonarr.exe", "--no-browser", "--data=/config"]
