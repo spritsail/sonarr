@@ -1,6 +1,6 @@
 repo = "spritsail/sonarr"
 architectures = ["amd64", "arm64"]
-publish_branches = ["master"]
+publish_branches = ["beta"]
 
 def main(ctx):
   builds = []
@@ -73,7 +73,7 @@ def publish(depends_on):
         "pull": "always",
         "settings": {
           "tags": [
-            "latest",
+            "beta",
             "%label io.spritsail.version.sonarr | %auto"
           ],
           "src_registry": {"from_secret": "registry_url"},
