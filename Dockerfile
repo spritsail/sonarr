@@ -6,12 +6,11 @@ ARG SONARR_BRANCH=main
 
 ENV SUID=906 SGID=900
 
-LABEL maintainer="Spritsail <sonarr@spritsail.io>" \
-      org.label-schema.vendor="Spritsail" \
-      org.label-schema.name="Sonarr" \
-      org.label-schema.url="https://sonarr.tv/" \
-      org.label-schema.description="A TV show management and downloader tool" \
-      org.label-schema.version=${SONARR_VER} \
+LABEL org.opencontainers.image.authors="Spritsail <sonarr@spritsail.io>" \
+      org.opencontainers.image.title="Sonarr" \
+      org.opencontainers.image.url="https://sonarr.tv/" \
+      org.opencontainers.image.description="A TV show management and downloader tool" \
+      org.opencontainers.image.version=${SONARR_VER} \
       io.spritsail.version.sonarr=${SONARR_VER}
 
 WORKDIR /sonarr
