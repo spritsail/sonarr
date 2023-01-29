@@ -35,7 +35,7 @@ ENV XDG_CONFIG_HOME=/config
 EXPOSE 8989
 
 HEALTHCHECK --start-period=10s --timeout=5s \
-    CMD wget -qO /dev/null 'http://localhost:8989/api/system/status' \
+    CMD wget -qO /dev/null 'http://localhost:8989/api/v3/system/status' \
             --header "x-api-key: $(xmlstarlet sel -t -v '/Config/ApiKey' /config/config.xml)"
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
