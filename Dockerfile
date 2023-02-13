@@ -2,7 +2,7 @@ FROM spritsail/alpine:3.17
 
 # http://services.sonarr.tv/v1/releases
 # https://services.sonarr.tv/v1/update/develop/changes?version=4&os=linux-musl
-ARG SONARR_VER=4.0.0.378
+ARG SONARR_VER=4.0.0.379
 ARG SONARR_BRANCH=develop
 
 ENV SUID=906 SGID=900
