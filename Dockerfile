@@ -1,8 +1,9 @@
-FROM spritsail/mono:4.5
+FROM spritsail/alpine:3.18
 
-ARG SONARR_VER=3.0.10.1567
-
-ARG SONARR_BRANCH=main
+# http://services.sonarr.tv/v1/releases
+# https://services.sonarr.tv/v1/update/develop/changes?version=4&os=linux-musl
+ARG SONARR_VER=4.0.1.933
+ARG SONARR_BRANCH=develop
 
 ENV SUID=906 SGID=900
 
@@ -15,17 +16,18 @@ LABEL org.opencontainers.image.authors="Spritsail <sonarr@spritsail.io>" \
 
 WORKDIR /sonarr
 
-COPY *.sh /usr/local/bin/
+COPY --chmod=755 *.sh /usr/local/bin/
 
-RUN apk add --no-cache ca-certificates-mono sqlite-libs libmediainfo xmlstarlet \
- && wget -O- "https://download.sonarr.tv/v3/${SONARR_BRANCH}/${SONARR_VER}/Sonarr.${SONARR_BRANCH}.${SONARR_VER}.linux.tar.gz" \
+RUN apk add --no-cache \
+        icu-libs \
+        sqlite-libs \
+        xmlstarlet \
+    \
+ && test "$(uname -m)" = aarch64 && ARCH=arm64 || ARCH=x64 \
+ && wget -O- "https://github.com/Sonarr/Sonarr/releases/download/v${SONARR_VER}/Sonarr.${SONARR_BRANCH}.${SONARR_VER}.linux-musl-${ARCH}.tar.gz" \
         | tar xz --strip-components=1 \
- && find -type f -exec chmod 644 {} + \
- && find -type d -o -name '*.exe' -exec chmod 755 {} + \
- && find -name '*.mdb' -delete \
-# Where we're going, we don't need ~roads~ updates!
- && rm -r Sonarr.Update \
- && chmod +x /usr/local/bin/*.sh
+ && rm -rfv Sonarr.Update \
+ && printf "UpdateMethod=docker\nBranch=${SONARR_BRANCH}\nPackageVersion=${SONARR_VER}" > package_info
 
 VOLUME /config
 ENV XDG_CONFIG_HOME=/config
@@ -33,8 +35,8 @@ ENV XDG_CONFIG_HOME=/config
 EXPOSE 8989
 
 HEALTHCHECK --start-period=10s --timeout=5s \
-    CMD wget -qO /dev/null 'http://localhost:8989/api/system/status' \
+    CMD wget -qO /dev/null 'http://localhost:8989/api/v3/system/status' \
             --header "x-api-key: $(xmlstarlet sel -t -v '/Config/ApiKey' /config/config.xml)"
 
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
-CMD ["mono", "/sonarr/Sonarr.exe", "--no-browser", "--data=/config"]
+CMD ["/sonarr/Sonarr", "--no-browser", "--data=/config"]
